@@ -1,11 +1,11 @@
 # Playwright Automation Test Framework
 
-## 📌 Project Overview
+##  ✅ Project Overview
 
-使用 Playwright + Pytest 建立 UI Automation Testing Framework。
+使用  Playwright + Pytest 建立 API 以及 UI Automation Testing Framework。
 
 
-## 🛠 Tech Stack
+## ✅  Tech Stack
 
 - Python
 - Playwright
@@ -16,9 +16,9 @@
 - pytest-rerunfailures
 
 
-## 📂 Project Structure
+## ✅  Project Structure
 
-demo_test
+demo
 |
 ├── pages
 ├── tests
@@ -26,23 +26,25 @@ demo_test
 ├── utils
 
 
-## 🚀 Installation
+## ✅  Installation
 
 pip install -r requirements.txt
 
 
-## ▶ Run Test
+## ✅  Run Test
 
 pytest
 
-
-## 📊 Allure Report
+##  ✅ Allure Report
 
 allure serve allure-results
 
+##  ✅ HTML Report
+
+Generate HTML report
 
 ## ✅ Test Coverage
-
+- Api test
 - Login
 - Product
 - Cart
