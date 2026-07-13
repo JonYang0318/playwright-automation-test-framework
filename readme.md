@@ -209,10 +209,13 @@ Covered scenarios:
 # 📷 Screenshots 測試報告截圖
 
 ## GitHub Actions CI Pipeline
+<img width="1631" height="763" alt="github_action" src="https://github.com/user-attachments/assets/0c758164-7052-4ac7-8cd6-46cdb93f5ab3" />
 
-![GitHub Actions](docs/screenshots/github_actions.png)
 
 
 ## Test Report
+<img width="1616" height="797" alt="html_test" src="https://github.com/user-attachments/assets/53d503fb-c129-4056-b6af-44e43f75cc4b" />
 
-![Test Report](docs/screenshots/allure_report.png)
+
+
+
