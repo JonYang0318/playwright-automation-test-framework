@@ -192,7 +192,7 @@ Covered scenarios:
 
 ---
 
-# ⭐ Framework Features
+#  Framework Features
 
 ✅ Page Object Model architecture  
 ✅ UI automation with Playwright  
@@ -210,9 +210,9 @@ Covered scenarios:
 
 ## GitHub Actions CI Pipeline
 
-![GitHub Actions](docs/screenshots/github_actions.png)
+![GitHub Actions](https://github.com/JonYang0318/playwright-automation-test-framework/blob/master/doc/screenshots/github_action.png)
 
 
 ## Test Report
 
-![Test Report](docs/screenshots/allure_report.png)
+![Test Report](https://github.com/JonYang0318/playwright-automation-test-framework/blob/master/doc/screenshots/html_test.png)
