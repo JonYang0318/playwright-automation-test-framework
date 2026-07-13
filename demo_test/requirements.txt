@@ -1,7 +1,0 @@
-pytest
-playwright
-pytest-playwright
-allure-pytest
-pytest-rerunfailures
-requests
-jsonschema
