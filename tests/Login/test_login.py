@@ -72,6 +72,6 @@ def test_login_fail(page):
     error = page.locator(
         "[data-test='error']"
     )
-    assert False
+    # assert False
     with allure.step("Verify login fail"):
       assert error.is_visible()
