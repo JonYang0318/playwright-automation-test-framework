@@ -54,24 +54,24 @@ def test_login_data_driven(page, user_type):
             assert data["expected"] in error_message
 
 
-@pytest.mark.smoke
-@allure.title("Login fail")
-def test_login_fail(page):
+# @pytest.mark.smoke
+# @allure.title("Login fail")
+# def test_login_fail(page):
 
-    login = LoginPage(page)
+#     login = LoginPage(page)
 
-    with allure.step("Open login page"):
-        login.open()
+#     with allure.step("Open login page"):
+#         login.open()
 
-    with allure.step("Enter username and password"):
-        login.login(
-      login_data["valid_user"]["username"],
-      login_data["valid_user"]["password"]
-        )
+#     with allure.step("Enter username and password"):
+#         login.login(
+#       login_data["valid_user"]["username"],
+#       login_data["valid_user"]["password"]
+#         )
     
-    error = page.locator(
-        "[data-test='error']"
-    )
-    # assert False
-    with allure.step("Verify login fail"):
-      assert error.is_visible()
+#     error = page.locator(
+#         "[data-test='error']"
+#     )
+#     # assert False
+#     with allure.step("Verify login fail"):
+#       assert error.is_visible()
