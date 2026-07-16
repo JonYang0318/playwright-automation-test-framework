@@ -1,100 +1,207 @@
 name: Playwright Automation
 
+
 on:
+
   push:
     branches:
       - master
+
 
   pull_request:
     branches:
       - master
 
+
+  workflow_dispatch:
+
+    inputs:
+
+      test_type:
+
+        description: "Select Test Type"
+
+        required: true
+
+        default: smoke
+
+        type: choice
+
+        options:
+
+          - smoke
+          - regression
+          - all
+
+
+
 jobs:
+
 
   smoke:
 
+
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.test_type == 'smoke' || github.event.inputs.test_type == 'all'
+
+
     runs-on: ubuntu-latest
+
 
     steps:
 
+
       - name: Checkout
+
         uses: actions/checkout@v4
 
+
+
       - name: Setup Python
+
         uses: actions/setup-python@v5
+
         with:
+
           python-version: "3.9"
 
+
+
       - name: Install dependency
+
         run: |
+
           pip install -r requirements.txt
+
           playwright install --with-deps
 
+
+
       - name: Run Smoke Test
+
         run: |
+
           pytest -m smoke \
           --alluredir=allure-results
 
+
+
       - name: Upload Smoke Result
+
         if: always()
+
         uses: actions/upload-artifact@v4
+
         with:
+
           name: smoke-allure-results
+
           path: allure-results
+
+
+
+
 
   regression:
 
-    needs: smoke
+
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.test_type == 'regression' || github.event.inputs.test_type == 'all')
+
 
     runs-on: ubuntu-latest
 
+
     steps:
 
+
       - name: Checkout
+
         uses: actions/checkout@v4
 
+
+
       - name: Setup Python
+
         uses: actions/setup-python@v5
+
         with:
+
           python-version: "3.9"
 
+
+
       - name: Install dependency
+
         run: |
+
           pip install -r requirements.txt
+
           playwright install --with-deps
 
+
+
       - name: Run Regression Test
+
         run: |
+
           pytest -m regression \
           --alluredir=allure-results \
           --html=report.html \
           --self-contained-html
 
+
+
       - name: Install Allure
+
         if: always()
+
         run: |
+
           sudo apt-get update
+
           sudo apt-get install -y default-jre
+
           wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+
           tar -zxvf allure-2.27.0.tgz
+
           sudo mv allure-2.27.0 /opt/allure
+
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
+
+
       - name: Generate Allure Report
+
         if: always()
+
         run: |
+
           allure generate allure-results -o allure-report --clean
 
+
+
       - name: Upload HTML Report
+
         if: always()
+
         uses: actions/upload-artifact@v4
+
         with:
-          name: pytest-html-report
+
+          name: regression-html-report
+
           path: report.html
 
+
+
       - name: Upload Allure Report
+
         if: always()
+
         uses: actions/upload-artifact@v4
+
         with:
-          name: allure-report
+
+          name: regression-allure-report
+
           path: allure-report
