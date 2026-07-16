@@ -31,17 +31,23 @@ playwright-automation-test-framework
 │   └── tests
 │
 ├── pages
+│   ├── auth
 │   ├── login
+│   ├── finish
 │   ├── inventory
 │   ├── cart
 │   └── checkout
 │
 ├── tests
-│   ├── Login
 │   ├── cart
 │   ├── checkout
 │   ├── finish
-│   └── negative
+│   ├── inventory
+│   ├── login
+|   ├── negative
+│   ├── retry
+│   ├── conftest.py
+│   └── test_fail_screenshot.py
 │
 ├── data
 │   └── login_data.json
@@ -80,6 +86,36 @@ playwright install
 ```
 
 ---
+
+# Test Execution Strategy
+
+## Smoke Test
+
+Core business flow validation:
+
+- Login
+- Add Product To Cart
+- Checkout
+- Complete Order
+
+Run:
+
+```bash
+pytest -m smoke
+```
+
+## Regression Test
+Core business flow validation:
+
+- API Automation Tests
+- Negative Tests
+
+Run:
+
+```bash
+pytest -m Regression
+```
+
 
 # ▶ Run Tests
 
@@ -211,10 +247,7 @@ Covered scenarios:
 ## GitHub Actions CI Pipeline
 <img width="1631" height="763" alt="github_action" src="https://github.com/user-attachments/assets/0c758164-7052-4ac7-8cd6-46cdb93f5ab3" />
 
-<<<<<<< HEAD
-![GitHub Actions](https://github.com/JonYang0318/playwright-automation-test-framework/blob/master/doc/screenshots/github_action.png)
-=======
->>>>>>> a9b9568e46cd4506866f9af2b55022df4f8a83b4
+
 
 
 ## Test Report
@@ -222,8 +255,3 @@ Covered scenarios:
 
 
 
-
-<<<<<<< HEAD
-![Test Report](https://github.com/JonYang0318/playwright-automation-test-framework/blob/master/doc/screenshots/html_test.png)
-=======
->>>>>>> a9b9568e46cd4506866f9af2b55022df4f8a83b4
