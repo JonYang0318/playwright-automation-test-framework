@@ -10,11 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
@@ -28,12 +27,23 @@ jobs:
           nohup uvicorn auth_server:app --host 0.0.0.0 > server.log 2>&1 &
           sleep 5
 
-          echo "=== Server Log ==="
-          cat server.log
+      - name: Install k6
+        run: |
+          curl -fsSL https://dl.k6.io/key.gpg | \
+          sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
 
-          curl --fail http://127.0.0.1:8000/docs
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | \
+          sudo tee /etc/apt/sources.list.d/k6.list
+
+          sudo apt-get update
+
+          sudo apt-get install -y k6
+
+      - name: Verify k6
+        run: |
+          k6 version
 
       - name: Run k6 Test
-        uses: grafana/run-k6-action@v1
-        with:
-          path: performance/k6/login_load_test.js
+        run: |
+          cd performance/k6
+          k6 run login_load_test.js
