@@ -5,7 +5,6 @@ on:
     branches:
       - master
 
-
 jobs:
 
   k6-test:
@@ -19,52 +18,54 @@ jobs:
         uses: actions/checkout@v4
 
 
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
 
-
       - name: Install Mock API Dependencies
         run: |
-
           pip install -r performance/mock/requirements.txt
-
 
 
       - name: Start Mock API
         run: |
-
           cd performance/mock
 
-          nohup uvicorn auth_server:app --host 0.0.0.0 > server.log 2>&1 &
-
+          nohup uvicorn auth_server:app \
+          --host 0.0.0.0 > server.log 2>&1 &
 
           sleep 5
 
-
           echo "=== Server Log ==="
-
           cat server.log
-
 
           curl --fail http://127.0.0.1:8000/docs
 
 
+      # 加這段
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo apt-get update
+          sudo apt-get install -y gnupg ca-certificates
+
+          curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
+
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
+          | sudo tee /etc/apt/sources.list.d/k6.list
+
+          sudo apt-get update
+          sudo apt-get install -y k6
 
 
-      - name: Run Login Load Test
+      - name: Run k6 Test
         uses: grafana/run-k6-action@v1
         with:
-
           path: performance/k6/login_load_test.js
-
-
 
       - name: Run API Stress Test
         uses: grafana/run-k6-action@v1
         with:
-
           path: performance/k6/api_stress_test.js
