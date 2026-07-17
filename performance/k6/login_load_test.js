@@ -84,7 +84,7 @@ export default function(){
         // 驗證登入成功有 token
 
         'has token':
-        (r)=>r.json('token') !== undefined,
+        (r)=>r.body && r.json('token') !== undefined,
 
 
         // 基本效能驗證
