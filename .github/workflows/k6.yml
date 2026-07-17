@@ -1,18 +1,13 @@
-name: k6 Performance Test
-
+name: K6 Performance Test
 
 on:
-
-  workflow_dispatch:
-
   push:
     branches:
-      - master
-
+      - main
 
 jobs:
 
-  performance:
+  k6-test:
 
     runs-on: ubuntu-latest
 
@@ -23,11 +18,34 @@ jobs:
         uses: actions/checkout@v4
 
 
-      - name: Setup k6
-        uses: grafana/setup-k6-action@v1
-
-
-      - name: Run k6 test
-        uses: grafana/run-k6-action@v1
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          path: performance/k6/login_load_test.js
+          python-version: "3.9"
+
+
+      - name: Install Mock API
+        run: |
+          pip install fastapi uvicorn
+
+
+      - name: Start Mock API
+        run: |
+          cd performance/mock
+          uvicorn auth_server:app --host 0.0.0.0 &
+          sleep 5
+
+          curl http://127.0.0.1:8000/docs
+          
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo apt-get update
+          sudo apt-get install -y k6
+
+
+      - name: Run k6 Test
+        run: |
+          cd performance/k6
+          k6 run login_load_test.js

@@ -2,8 +2,7 @@ export const smokeScenario = {
 
     executor: 'constant-vus',
 
-    // CI Pipeline 使用
-    // 少量使用者快速驗證 API
+    //  給CI Pipeline 使用 少量使用者快速驗證 API
 
     vus: 5,
 
