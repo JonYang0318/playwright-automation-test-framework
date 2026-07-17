@@ -11,12 +11,14 @@
 | Pytest | Test Framework |
 | Page Object Model (POM) | Test Maintainability |
 | Requests | API Automation Testing |
+| k6 | Performance & Load Testing |
 | Allure Report | Test Report |
 | pytest-html | HTML Test Report |
 | pytest-rerunfailures | Retry Mechanism |
 | Docker | Test Environment |
 | GitHub Actions | CI/CD Pipeline |
 | Git | Version Control |
+| FastAPI | Mock API Server |
 
 ---
 
@@ -54,9 +56,12 @@ playwright-automation-test-framework
 │
 ├── performance
 │   └── k6
-│        └── api_stress_test.js
-│        └── login_load_test.js
-│        └── scenarios.js
+│   │     └── api_stress_test.js
+│   │     └── login_load_test.js
+│   │     └── scenarios.js
+│   └── mock
+│       ├── auth_server.py
+│       └── requirements.txt
 ├── utils
 │
 ├── docs
@@ -188,18 +193,30 @@ docker run playwright-test
 
 ---
 
-# 🔄 CI/CD Pipeline
+# CI/CD Pipeline
 
-Implemented GitHub Actions workflow.
+Implemented GitHub Actions workflows for automated testing.
 
-The pipeline automatically:
+## Automation Test Pipeline
 
-- Checkout source code
-- Setup Python environment
-- Install dependencies
+The pipeline executes:
+
+- Install Python dependencies
 - Install Playwright browsers
-- Execute automated tests
-- Generate test reports
+- Run UI automation tests
+- Run API automation tests
+- Generate Allure reports
+
+
+## Performance Test Pipeline
+
+The pipeline executes:
+
+- Setup FastAPI mock server
+- Install k6
+- Execute k6 load testing
+- Validate performance thresholds
+
 
 Workflow triggers:
 
@@ -233,16 +250,46 @@ Covered scenarios:
 
 ---
 
-## Performance Testing效能測試
+## Performance Testing
 
-Implemented performance testing using k6.
+Implemented API performance testing using k6.
+
+A lightweight FastAPI mock server is created
+to provide stable test endpoints during CI execution.
 
 
 Covered scenarios:
-- Load Testing
-- Stress Testing
-- Response Time Validation
-- Threshold Based CI Failure
+
+### Load Testing
+
+Simulate multiple concurrent users accessing login API.
+
+Validation:
+
+- HTTP status code
+- Response time
+- Error rate
+
+
+### Stress Testing
+
+Evaluate API behavior under increasing traffic.
+
+Validation:
+
+- System stability
+- Response degradation
+- Failure rate
+
+
+### Performance Threshold
+
+Configured k6 thresholds:
+
+- 95% requests response time < 2 seconds
+- API failure rate < 5%
+
+CI pipeline will fail when performance requirements are not met.
 
 #  Framework Features
 
@@ -255,7 +302,9 @@ Covered scenarios:
 ✅ Dockerized test execution  
 ✅ GitHub Actions CI/CD integration  
 ✅ Failure screenshot capture  
-
+✅ Performance testing with k6
+✅ Mock API environment for stable load testing
+✅ CI performance threshold validation
 ---
 
 # 📷 Screenshots 測試報告截圖
