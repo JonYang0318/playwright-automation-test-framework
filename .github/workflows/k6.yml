@@ -6,46 +6,34 @@ on:
       - main
 
 jobs:
-
   k6-test:
-
     runs-on: ubuntu-latest
 
-
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
-
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
-
-      - name: Install Mock API
+      - name: Install Mock API Dependencies
         run: |
           pip install fastapi uvicorn
-
 
       - name: Start Mock API
         run: |
           cd performance/mock
-          uvicorn auth_server:app --host 0.0.0.0 &
+          nohup uvicorn auth_server:app --host 0.0.0.0 > server.log 2>&1 &
           sleep 5
 
-          curl http://127.0.0.1:8000/docs
-          
+          echo "=== Server Log ==="
+          cat server.log
 
-      - name: Install k6
-        run: |
-          sudo gpg -k
-          sudo apt-get update
-          sudo apt-get install -y k6
-
+          curl --fail http://127.0.0.1:8000/docs
 
       - name: Run k6 Test
-        run: |
-          cd performance/k6
-          k6 run login_load_test.js
+        uses: grafana/run-k6-action@v1
+        with:
+          path: performance/k6/login_load_test.js
