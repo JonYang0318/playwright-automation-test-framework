@@ -69,3 +69,12 @@ jobs:
         uses: grafana/run-k6-action@v1
         with:
           path: performance/k6/api_stress_test.js
+
+
+      - name: Notify Slack
+        if: always()
+        run: |
+          curl -X POST \
+          -H 'Content-type: application/json' \
+          --data '{"text":"K6 Performance Test Finished"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}

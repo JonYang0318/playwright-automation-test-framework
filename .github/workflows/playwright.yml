@@ -205,3 +205,12 @@ jobs:
           name: regression-allure-report
 
           path: allure-report
+
+      
+      - name: Notify Slack
+        if: always()
+        run: |
+          curl -X POST \
+          -H 'Content-type: application/json' \
+          --data '{"text":"K6 Performance Test Finished"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
