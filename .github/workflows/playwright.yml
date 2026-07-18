@@ -28,6 +28,7 @@ on:
         type: choice
 
         options:
+
           - smoke
           - regression
           - all
@@ -83,7 +84,22 @@ jobs:
         run: |
 
           pytest -m smoke \
-          --alluredir=allure-results
+          --alluredir=allure-results \
+          --html=smoke-report.html \
+          --self-contained-html
+
+
+      - name: Upload Smoke HTML Report
+
+        if: always()
+
+        uses: actions/upload-artifact@v4
+
+        with:
+
+          name: smoke-html-report
+
+          path: smoke-report.html
 
 
 
@@ -152,7 +168,7 @@ jobs:
 
           pytest -m regression \
           --alluredir=allure-results \
-          --html=report.html \
+          --html=regression-report.html \
           --self-contained-html
 
 
@@ -167,13 +183,18 @@ jobs:
 
           sudo apt-get install -y default-jre
 
+
           wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+
 
           tar -zxvf allure-2.27.0.tgz
 
+
           sudo mv allure-2.27.0 /opt/allure
 
+
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+
 
 
 
@@ -189,7 +210,8 @@ jobs:
 
 
 
-      - name: Upload HTML Report
+
+      - name: Upload Regression HTML Report
 
         if: always()
 
@@ -199,11 +221,12 @@ jobs:
 
           name: regression-html-report
 
-          path: report.html
+          path: regression-report.html
 
 
 
-      - name: Upload Allure Report
+
+      - name: Upload Regression Allure Report
 
         if: always()
 
@@ -225,7 +248,6 @@ jobs:
     needs:
 
       - smoke
-
       - regression
 
 
@@ -235,6 +257,7 @@ jobs:
     runs-on: ubuntu-latest
 
 
+
     steps:
 
 
@@ -242,9 +265,18 @@ jobs:
 
         run: |
 
+
           curl -X POST \
           -H 'Content-type: application/json' \
           --data "{
-            \"text\":\"🎭 Playwright Automation Finished\n\nSmoke Test: ${{ needs.smoke.result }}\nRegression Test: ${{ needs.regression.result }}\nBranch: ${{ github.ref_name }}\"
+
+            \"text\":\"🎭 Playwright Automation Finished\n\n\
+Status: ${{ job.status }}\n\n\
+Smoke Test: ${{ needs.smoke.result }}\n\
+Regression Test: ${{ needs.regression.result }}\n\n\
+Branch: ${{ github.ref_name }}\n\n\
+Report:\n\
+https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+
           }" \
           ${{ secrets.SLACK_WEBHOOK_URL }}
