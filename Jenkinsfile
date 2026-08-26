@@ -21,24 +21,24 @@ pipeline {
 
         stage('Build Image') {
             steps {
-                sh 'docker build -t ${IMAGE_NAME} .'
+                bat 'docker build -t %IMAGE_NAME% .'
             }
         }
 
         stage('Run E2E Tests') {
             steps {
-                sh 'mkdir -p ${REPORT_DIR} ${SCREENSHOT_DIR}'
-                sh '''
-                    docker run --rm \
-                      -u $(id -u):$(id -g) \
-                      -e PYTHONPATH=/app \
-                      -v "$PWD":/app \
-                      -w /app \
-                      ${IMAGE_NAME} \
-                      python -m pytest tests/e2e/test_parabank.py \
-                        --html=${REPORT_DIR}/pytest-report.html \
-                        --self-contained-html \
-                        --junitxml=${REPORT_DIR}/junit.xml \
+                bat '''
+                    if not exist "%REPORT_DIR%" mkdir "%REPORT_DIR%"
+                    if not exist "%SCREENSHOT_DIR%" mkdir "%SCREENSHOT_DIR%"
+                    docker run --rm ^
+                      -e PYTHONPATH=/app ^
+                      -v "%WORKSPACE%:/app" ^
+                      -w /app ^
+                      %IMAGE_NAME% ^
+                      python -m pytest tests/e2e/test_parabank.py ^
+                        --html=%REPORT_DIR%/pytest-report.html ^
+                        --self-contained-html ^
+                        --junitxml=%REPORT_DIR%/junit.xml ^
                         --tb=short
                 '''
                 archiveArtifacts artifacts: 'artifacts/**', allowEmptyArchive: true, fingerprint: true
