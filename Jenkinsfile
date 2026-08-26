@@ -41,27 +41,8 @@ pipeline {
                         --junitxml=${REPORT_DIR}/junit.xml \
                         --tb=short
                 '''
+                archiveArtifacts artifacts: 'artifacts/**', allowEmptyArchive: true, fingerprint: true
             }
-            post {
-                always {
-                    junit allowEmptyResults: true, testResults: 'artifacts/reports/junit.xml'
-                    publishHTML(target: [
-                        allowMissing: true,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'artifacts/reports',
-                        reportFiles: 'pytest-report.html',
-                        reportName: 'Pytest HTML Report'
-                    ])
-                    archiveArtifacts artifacts: 'artifacts/**', allowEmptyArchive: true, fingerprint: true
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
         }
     }
 }

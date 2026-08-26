@@ -24,6 +24,7 @@ docker run --rm -v ${PWD}:/app demo-bank-e2e
 ```
 
 Jenkins 版本會先用 `Dockerfile` 建 image，再在容器內跑 `pytest`，最後把 JUnit 與 HTML 報表、截圖一起 archive。
+目前 `Jenkinsfile` 只依賴基本 Pipeline 能力，不需要另外安裝 HTML Publisher 或 JUnit 外掛。
 
 ### Jenkins 建置步驟
 1. 安裝必要外掛：`Pipeline`、`Git`、`JUnit`、`HTML Publisher`
@@ -36,6 +37,7 @@ Jenkins 版本會先用 `Dockerfile` 建 image，再在容器內跑 `pytest`，�
 - `artifacts/reports/junit.xml`
 - `artifacts/reports/pytest-report.html`
 - `artifacts/screenshots/`
+- 這些檔案會直接作為 build artifacts 保留在 Jenkins
 
 ## 報表輸出
 - GitHub Actions 會產生：
