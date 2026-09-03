@@ -62,7 +62,7 @@ class TestParaBankPage:
             expect(parabank_page.accounts_overview_heading).to_contain_text(
                 "Accounts Overview", timeout=15000
             )
-            expect(page.get_by_role("cell", name="Account")).to_be_visible(timeout=15000)
+            expect(page.get_by_role("columnheader", name="Account")).to_be_visible(timeout=15000)
             expect(page.locator("th").filter(has_text="Balance*")).to_be_visible(timeout=15000)
         except Exception:
             ParaBankPage(page).capture_failure_screenshot("parabank_accounts_overview_failed")
