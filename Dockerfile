@@ -14,4 +14,4 @@ COPY . .
 
 RUN mkdir -p artifacts/reports artifacts/screenshots
 
-CMD ["python", "-m", "pytest", "tests/e2e/test_parabank.py", "--html=artifacts/reports/pytest-report.html", "--self-contained-html", "--junitxml=artifacts/reports/junit.xml", "--tb=short"]
+CMD ["python", "scripts/run_e2e.py"]

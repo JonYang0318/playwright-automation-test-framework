@@ -23,7 +23,8 @@ docker build -t demo-bank-e2e .
 docker run --rm -v ${PWD}:/app demo-bank-e2e
 ```
 
-Jenkins 版本會先用 `Dockerfile` 建 image，再在容器內跑 `pytest`，最後把 JUnit 與 HTML 報表、截圖一起 archive。
+Jenkins、GitHub Actions 與 Docker 都共用 `scripts/run_e2e.py`，因此要回退 CI 行為時，通常只要改一個入口腳本。
+Jenkins 版本會先用 `Dockerfile` 建 image，再在容器內跑測試，最後把 JUnit 與 HTML 報表、截圖一起 archive。
 目前 `Jenkinsfile` 只依賴基本 Pipeline 能力，不需要另外安裝 HTML Publisher 或 JUnit 外掛。
 
 ### Jenkins 建置步驟
