@@ -3,3 +3,4 @@ pytest>=8.0,<9
 pytest-playwright>=0.7,<1
 pytest-html>=4.1,<5
 pytest-rerunfailures>=15,<16
+pytest-bdd>=8,<9

@@ -4,7 +4,7 @@
 - 測試頁面：ParaBank Demo Banking Site
 - 官方站點：[https://parabank.parasoft.com/parabank](https://parabank.parasoft.com/parabank)
 - 測試帳號：`john` / `demo`
-- 自動化框架：Python + Playwright + Pytest + POM
+- 自動化框架：Python + Playwright + Pytest + pytest-bdd + POM
 
 ## 測試案例
 - [x] TC-01 開啟 ParaBank 首頁
@@ -25,6 +25,7 @@
 - 優先使用 `role` 與 `id` 做定位
 - 使用 `expect(...).to_be_visible()`、`expect(...).to_have_url()`、`expect(...).to_contain_text()` 進行動態等待
 - 測試失敗時輸出 screenshot 方便追查
+- Gherkin feature 位於 `features/parabank.feature`，步驟定義位於 `tests/e2e/test_parabank.py`
 
 ## 備註
 - 測試重試標註使用 `@pytest.mark.flaky(reruns=2)`

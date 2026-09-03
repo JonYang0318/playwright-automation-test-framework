@@ -1,9 +1,10 @@
 # Demo Test
 
-Python + Playwright + Pytest 的 ParaBank E2E 自動化測試範例，採用 Page Object Model。
+Python + Playwright + Pytest 的 ParaBank E2E 自動化測試範例，採用 BDD、Page Object Model。
 
 ## 內容
-- `tests/e2e/test_parabank.py`：登入 / 登出主測試
+- `features/parabank.feature`：以 Gherkin 描述使用者情境
+- `tests/e2e/test_parabank.py`：pytest-bdd 步驟定義與測試載入
 - `pages/parabank_page.py`：頁面操作封裝
 - `doc/test/parabank.md`：測試案例清單
 - `.github/workflows/e2e.yml`：GitHub Actions CI
