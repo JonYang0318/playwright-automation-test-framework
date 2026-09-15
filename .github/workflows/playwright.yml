@@ -1,245 +1,174 @@
 name: Playwright Automation
 
-
 on:
-
   push:
     branches:
       - master
-
 
   pull_request:
     branches:
       - master
 
-
   workflow_dispatch:
-
     inputs:
-
       test_type:
-
         description: "Select Test Type"
-
         required: true
-
         default: smoke
-
         type: choice
-
         options:
           - smoke
           - regression
           - all
 
-
+env:
+  RESULTS_ROOT: caseflow-results
 
 jobs:
-
-
   smoke:
-
-
-    if: >
+    if: >-
       github.event_name != 'workflow_dispatch' ||
       github.event.inputs.test_type == 'smoke' ||
       github.event.inputs.test_type == 'all'
-
-
     runs-on: ubuntu-latest
 
-
     steps:
-
-
       - name: Checkout
-
         uses: actions/checkout@v4
 
-
+      - name: Prepare Smoke Results
+        if: always()
+        run: |
+          mkdir -p "${RESULTS_ROOT}/smoke"
+          printf 'suite=smoke\nrun_id=%s\ncommit=%s\n' \
+            "${GITHUB_RUN_ID}" "${GITHUB_SHA}" \
+            > "${RESULTS_ROOT}/smoke/run-context.txt"
 
       - name: Setup Python
-
         uses: actions/setup-python@v5
-
         with:
-
           python-version: "3.9"
 
-
-
       - name: Install Dependencies
-
         run: |
-
           pip install -r requirements.txt
-
           playwright install --with-deps
 
-
-
       - name: Run Smoke Test
-
         run: |
-
           pytest -m smoke \
-          --alluredir=allure-results
+            --junitxml="${RESULTS_ROOT}/smoke/junit.xml" \
+            --alluredir="${RESULTS_ROOT}/smoke/allure-results" \
+            --output="${RESULTS_ROOT}/smoke/playwright" \
+            --screenshot=only-on-failure \
+            --tracing=retain-on-failure
 
-
-
-      - name: Upload Smoke Allure Result
-
+      - name: Upload Smoke Results
         if: always()
-
         uses: actions/upload-artifact@v4
-
         with:
-
-          name: smoke-allure-results
-
-          path: allure-results
-
-
-
-
+          name: caseflow-results-smoke
+          path: ${{ env.RESULTS_ROOT }}
+          if-no-files-found: error
 
   regression:
-
-
-    if: >
+    if: >-
       github.event_name == 'workflow_dispatch' &&
       (
         github.event.inputs.test_type == 'regression' ||
         github.event.inputs.test_type == 'all'
       )
-
-
     runs-on: ubuntu-latest
 
-
     steps:
-
-
       - name: Checkout
-
         uses: actions/checkout@v4
 
-
+      - name: Prepare Regression Results
+        if: always()
+        run: |
+          mkdir -p "${RESULTS_ROOT}/regression"
+          printf 'suite=regression\nrun_id=%s\ncommit=%s\n' \
+            "${GITHUB_RUN_ID}" "${GITHUB_SHA}" \
+            > "${RESULTS_ROOT}/regression/run-context.txt"
 
       - name: Setup Python
-
         uses: actions/setup-python@v5
-
         with:
-
           python-version: "3.9"
 
-
-
       - name: Install Dependencies
-
         run: |
-
           pip install -r requirements.txt
-
           playwright install --with-deps
 
-
-
       - name: Run Regression Test
-
         run: |
-
           pytest -m regression \
-          --alluredir=allure-results \
-          --html=report.html \
-          --self-contained-html
-
-
+            --junitxml="${RESULTS_ROOT}/regression/junit.xml" \
+            --alluredir="${RESULTS_ROOT}/regression/allure-results" \
+            --html="${RESULTS_ROOT}/regression/report.html" \
+            --self-contained-html \
+            --output="${RESULTS_ROOT}/regression/playwright" \
+            --screenshot=only-on-failure \
+            --tracing=retain-on-failure
 
       - name: Install Allure
-
         if: always()
-
         run: |
-
           sudo apt-get update
-
           sudo apt-get install -y default-jre
-
           wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
-
           tar -zxvf allure-2.27.0.tgz
-
           sudo mv allure-2.27.0 /opt/allure
-
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
-
-
       - name: Generate Allure Report
-
         if: always()
-
         run: |
+          allure generate "${RESULTS_ROOT}/regression/allure-results" \
+            -o "${RESULTS_ROOT}/regression/allure-report" \
+            --clean
 
-          allure generate allure-results \
-          -o allure-report \
-          --clean
-
-
-
-      - name: Upload HTML Report
-
+      - name: Upload Regression Results
         if: always()
-
         uses: actions/upload-artifact@v4
-
         with:
+          name: caseflow-results-regression
+          path: ${{ env.RESULTS_ROOT }}
+          if-no-files-found: error
 
-          name: regression-html-report
-
-          path: report.html
-
-
-
-      - name: Upload Allure Report
-
-        if: always()
-
-        uses: actions/upload-artifact@v4
-
-        with:
-
-          name: regression-allure-report
-
-          path: allure-report
-
-
-
-
-
-  notify-slack:
-
+  publish-results:
     needs:
       - smoke
       - regression
-
-    if: always()
-
+    if: >-
+      always() &&
+      (needs.smoke.result != 'skipped' || needs.regression.result != 'skipped')
     runs-on: ubuntu-latest
 
     steps:
+      - name: Publish Unified Caseflow Results
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: caseflow-results
+          pattern: caseflow-results-*
+          delete-merged: true
 
+  notify-slack:
+    needs:
+      - smoke
+      - regression
+      - publish-results
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Notify Slack
-
         run: |
-
           curl -X POST \
           -H "Content-type: application/json" \
           --data '{
             "text":"🎭 *Playwright Automation Test Result*\n\n📌 Workflow: '${{ github.workflow }}'\n🌿 Branch: '${{ github.ref_name }}'\n👤 Triggered By: '${{ github.actor }}'\n📅 Run Number: '${{ github.run_number }}'\n📝 Commit: '${{ github.sha }}'\n\n🧪 Smoke Test: '${{ needs.smoke.result }}'\n🔄 Regression Test: '${{ needs.regression.result }}'\n\n🔗 GitHub Action:\nhttps://github.com/'${{ github.repository }}'/actions/runs/'${{ github.run_id }}'"
           }' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
-
-          
