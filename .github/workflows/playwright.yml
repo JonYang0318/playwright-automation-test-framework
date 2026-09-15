@@ -104,7 +104,7 @@ jobs:
 
       - name: Run Regression Test
         run: |
-          pytest -m regression \
+          pytest -m "not smoke" \
             --junitxml="${RESULTS_ROOT}/regression/junit.xml" \
             --alluredir="${RESULTS_ROOT}/regression/allure-results" \
             --html="${RESULTS_ROOT}/regression/report.html" \
@@ -162,13 +162,20 @@ jobs:
       - publish-results
     if: always()
     runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
     steps:
       - name: Notify Slack
+        if: env.SLACK_WEBHOOK_URL != ''
         run: |
           curl -X POST \
           -H "Content-type: application/json" \
           --data '{
             "text":"🎭 *Playwright Automation Test Result*\n\n📌 Workflow: '${{ github.workflow }}'\n🌿 Branch: '${{ github.ref_name }}'\n👤 Triggered By: '${{ github.actor }}'\n📅 Run Number: '${{ github.run_number }}'\n📝 Commit: '${{ github.sha }}'\n\n🧪 Smoke Test: '${{ needs.smoke.result }}'\n🔄 Regression Test: '${{ needs.regression.result }}'\n\n🔗 GitHub Action:\nhttps://github.com/'${{ github.repository }}'/actions/runs/'${{ github.run_id }}'"
           }' \
-          ${{ secrets.SLACK_WEBHOOK_URL }}
+          "$SLACK_WEBHOOK_URL"
+
+      - name: Skip Slack Notification
+        if: env.SLACK_WEBHOOK_URL == ''
+        run: echo "SLACK_WEBHOOK_URL is not configured; notification skipped."
